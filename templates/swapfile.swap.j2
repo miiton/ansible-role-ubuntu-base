@@ -1,0 +1,12 @@
+[Unit]
+Description=Turn on swap
+[Service]
+Type=oneshot
+Environment="SWAPFILE={{ swap_file }}"
+RemainAfterExit=true
+ExecStartPre=/usr/sbin/losetup -f ${SWAPFILE}
+ExecStart=/usr/bin/sh -c "/sbin/swapon $(/sbin/losetup -j ${SWAPFILE} | /usr/bin/cut -d : -f 1)"
+ExecStop=/usr/bin/sh -c "/sbin/swapoff $(/sbin/losetup -j ${SWAPFILE} | /usr/bin/cut -d : -f 1)"
+ExecStopPost=/usr/bin/sh -c "/sbin/losetup -d $(/sbin/losetup -j ${SWAPFILE} | /usr/bin/cut -d : -f 1)"
+[Install]
+WantedBy=multi-user.target

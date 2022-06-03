@@ -1,0 +1,88 @@
+---
+- name: Install packages
+  apt:
+    update_cache: yes
+    name:
+      - htop
+      - unzip
+      - python
+      - python-pip
+      - fail2ban
+    state: present
+
+- name: Set sshd port to {{ ssh_port }}
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    state: present
+    regexp: "^Port.*"
+    line: "Port {{ ssh_port }}"
+
+- name: set timezone to Asia/Tokyo
+  timezone:
+    name: Asia/Tokyo
+
+- name: Set sshd PasswordAuthentication to no
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    state: present
+    regexp: "^PasswordAuthentication.*"
+    line: "PasswordAuthentication no"
+
+- name: Set sshd PermitRootLogin to no
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    state: present
+    regexp: "^PermitRootLogin.*"
+    line: "PermitRootLogin no"
+
+- name: Allow ssh
+  ufw:
+    rule: allow
+    port: "{{ ssh_port }}"
+    proto: tcp
+
+- name: Deny everything and enable UFW
+  ufw:
+    state: enabled
+    policy: deny
+
+- name: Create swapfile
+  command: dd if=/dev/zero of={{ swap_file }} bs={{ swap_size_mb }} count=1M
+  args:
+    creates: "{{ swap_file }}"
+
+- name: Chmod swapfile
+  file:
+    path: "{{ swap_file }}"
+    mode: "0600"
+
+- name: Check swapfile
+  command: file {{ swap_file }}
+  register: swap_file_test
+  check_mode: no
+
+- name: Mkswap
+  command: mkswap {{ swap_file }}
+  when: swap_file_test.stdout.find('swap file') == -1
+
+- name: Copy swap config file
+  template: src=templates/swapfile.swap.j2 dest=/etc/systemd/system/swapfile.swap
+
+- name: Start swapfile.swap
+  systemd:
+    name: swapfile.swap
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Put jail.local
+  copy:
+    src: jail.local
+    dest: /etc/fail2ban/jail.local
+  notify: Restart fail2ban
+
+- name: Enable fail2ban
+  systemd:
+    name: fail2ban
+    enabled: yes
+    state: started
