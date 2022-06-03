@@ -13,3 +13,5 @@ galaxy_info:
   galaxy_tags:
     - system
     - security
+
+allow_duplicates: no
