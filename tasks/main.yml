@@ -4,7 +4,7 @@
     update_cache: yes
     name:
       - htop
-      - unzip
+      - 7zip
       - python
       - python-pip
       - fail2ban
