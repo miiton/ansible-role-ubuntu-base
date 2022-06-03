@@ -35,16 +35,16 @@
     regexp: "^PermitRootLogin.*"
     line: "PermitRootLogin no"
 
-- name: Allow ssh
-  ufw:
-    rule: allow
-    port: "{{ ssh_port }}"
-    proto: tcp
-
-- name: Deny everything and enable UFW
-  ufw:
-    state: enabled
-    policy: deny
+# - name: Allow ssh
+#   ufw:
+#     rule: allow
+#     port: "{{ ssh_port }}"
+#     proto: tcp
+#
+# - name: Deny everything and enable UFW
+#   ufw:
+#     state: enabled
+#     policy: deny
 
 - name: Create swapfile
   command: dd if=/dev/zero of={{ swap_file }} bs={{ swap_size_mb }} count=1M
