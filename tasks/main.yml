@@ -66,7 +66,9 @@
   when: swap_file_test.stdout.find('swap file') == -1
 
 - name: Copy swap config file
-  template: src=templates/swapfile.swap.j2 dest=/etc/systemd/system/swapfile.swap
+  template:
+    src: templates/swapfile.swap.j2
+    dest: /etc/systemd/system/swapfile.swap
 
 - name: Start swapfile.swap
   systemd:
@@ -76,8 +78,8 @@
   become: yes
 
 - name: Put jail.local
-  copy:
-    src: jail.local
+  template:
+    src: templates/jail.local.j2
     dest: /etc/fail2ban/jail.local
   notify: Restart fail2ban
 

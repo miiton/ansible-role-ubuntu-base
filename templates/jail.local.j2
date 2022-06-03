@@ -45,7 +45,7 @@ action_abuseipdb = abuseipdb
 action = %(action_)s
 
 [sshd]
-port    = 5622
+port    = {{ ssh_port }}
 logpath = %(sshd_log)s
 backend = %(sshd_backend)s
 
