@@ -90,8 +90,8 @@
     state: started
 
 - name: Put files to /etc/skel
-  template:
-    src: "{{ item }}.j2"
+  copy:
+    src: "{{ item }}"
     dest: "/etc/skel/{{ item }}"
   with_items:
     - .bash_profile
