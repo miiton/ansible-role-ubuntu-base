@@ -75,7 +75,7 @@
     name: swapfile.swap
     state: started
     enabled: yes
-  become: yes
+  become: true
 
 - name: Put jail.local
   template:
@@ -88,3 +88,17 @@
     name: fail2ban
     enabled: yes
     state: started
+
+- name: Put files to /etc/skel
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/skel/{{ item }}"
+  with_items:
+    - .bash_profile
+    - .vimrc
+      
+- name: Mkdir /etc/skel/.vimundo
+  file:
+    state: directory
+    path: /etc/skel/.vimundo
+    mode: 0755
